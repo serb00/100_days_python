@@ -2,13 +2,16 @@ import colorgram
 import turtle
 import random
 
-colors = []
-color_index = 0
+# Global constants
 PICTURE_ROWS = 14
 PICTURE_COLUMNS = 9
 FILE_NAME = 'hirst.jpg'
 SPACE_PIXELS = 45
 DOTS_SIZE = 20
+
+# global variables
+colors = []
+color_index = 0
 
 
 def get_next_color():
