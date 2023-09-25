@@ -6,6 +6,8 @@ import random
 PICTURE_ROWS = 14
 PICTURE_COLUMNS = 9
 FILE_NAME = 'hirst.jpg'
+EXTRACT_COLORS = 30
+SKIP_COLORS = 4
 SPACE_PIXELS = 45
 DOTS_SIZE = 20
 
@@ -32,6 +34,7 @@ def draw_picture(rows, columns):
     turtle.colormode(255)
     tim = turtle.Turtle()
     tim.speed(0)
+    tim.hideturtle()
     offset_x = -(columns / 2 * SPACE_PIXELS)
     offset_y = -(rows / 2 * SPACE_PIXELS)
     tim.penup()
@@ -40,7 +43,6 @@ def draw_picture(rows, columns):
         for column in range(columns):
             tim.dot(DOTS_SIZE, get_random_color())
             tim.forward(SPACE_PIXELS)
-    tim.setposition(1000, 1000)
 
 
 def hirst(rows, columns):
@@ -52,7 +54,7 @@ def hirst(rows, columns):
 
 def get_colors_from_file(file):
     global colors
-    colors = colorgram.extract(file, 25)
+    colors = colorgram.extract(file, EXTRACT_COLORS)[SKIP_COLORS:]
 
 
 if __name__ == "__main__":
