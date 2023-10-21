@@ -35,8 +35,8 @@ def run():
 
         # Detect collision with the wall or own tail
         if snake.is_hitting_wall(screen_width=SCREEN_WIDTH, screen_height=SCREEN_HEIGHT) or snake.is_hitting_tail():
-            GAME_IS_ON = False
-            scoreboard.game_over()
+            scoreboard.reset_score()
+            snake.reset_snake()
 
         time.sleep(1 / FPS)
 

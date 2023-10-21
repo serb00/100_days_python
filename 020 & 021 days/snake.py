@@ -22,6 +22,10 @@ class Snake:
                  size=SNAKE_SEGMENT_PIXELS,
                  start_x=SNAKE_START_X,
                  start_y=SNAKE_START_Y):
+        self.snake: list[Turtle] = []
+        self.head: Turtle = self.create_snake(color, segments, size, start_x, start_y)
+
+    def create_snake(self, color, segments, size, start_x, start_y):
         snake: list[Turtle] = []
         for i in range(segments):
             t = Turtle(shape="square")
@@ -29,9 +33,8 @@ class Snake:
             t.penup()
             t.setposition(x=start_x - size * i, y=start_y)
             snake.append(t)
-
         self.snake = snake
-        self.head = self.snake[0]
+        return self.snake[0]
 
     def move(self, speed=SNAKE_SPEED):
         for i in range(len(self.snake) - 1, 0, -1):
@@ -72,3 +75,13 @@ class Snake:
             if self.head.distance(segment) < 10:
                 return True
         return False
+
+    def reset_snake(self):
+        for segment in self.snake:
+            segment.goto(1000, 1000)
+        self.snake.clear()
+        self.head = self.create_snake(SNAKE_COLOR,
+                                      SNAKE_STARTING_SEGMENTS,
+                                      SNAKE_SEGMENT_PIXELS,
+                                      SNAKE_START_X,
+                                      SNAKE_START_Y)
