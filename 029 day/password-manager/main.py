@@ -2,6 +2,10 @@ from tkinter import *
 from tkinter import messagebox
 import random
 import pyperclip
+import json
+
+PASSWORDS_JSON = "passwords.json"
+
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 
@@ -23,6 +27,24 @@ def generate_password():
     entry_password.delete(0, END)
     entry_password.insert(0, password)
     pyperclip.copy(password)
+
+# ---------------------------- SEARCH WEBSITE ------------------------------- #
+
+
+def search_website():
+    try:
+        with open(PASSWORDS_JSON, mode="r") as file:
+            data = json.load(file)
+            website = entry_website.get()
+            item = data[website]
+            username = item["username"]
+            password = item["password"]
+    except FileNotFoundError:
+        messagebox.showerror(title="Database not found", message="You haven't saved any passwords yet.")
+    except KeyError:
+        messagebox.showinfo(title="Not found", message=f"{website} is not presented in the database.")
+    else:
+        messagebox.showinfo(title=website, message=f"Username: {username}\nPassword: {password}")
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 
@@ -46,20 +68,26 @@ def add_password():
     website = entry_website.get()
     username = entry_username.get()
     password = entry_password.get()
+    new_data = { website : {
+        "username": username,
+        "password": password
+    }}
 
     if not validate_entries():
         messagebox.showerror(title="Validation error", message="Please enter correct data.")
-        return
-
-    is_ok = messagebox.askokcancel(title=website, message=f"""You're doing to add this to database.
-Username: {username}
-Password: {password}
-Please press OK to add.""")
-
-    if is_ok:
-        with open("passwords.txt", mode="a") as file:
-            file.write(f"{website}|{username}|{password}\n")
-        restore_entries()
+    else:
+        try:
+            with open(PASSWORDS_JSON, mode="r") as file:
+                data = json.load(file)
+                data.update(new_data)
+        except FileNotFoundError:
+            with open(PASSWORDS_JSON, mode="w") as file:
+                json.dump(new_data, file, indent=4)
+        else:
+            with open(PASSWORDS_JSON, mode="w") as file:
+                json.dump(data, file, indent=4)
+        finally:
+            restore_entries()
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -84,9 +112,12 @@ lbl_password = Label(text="Password:")
 lbl_password.grid(row=3, column=0)
 
 # Entries
-entry_website = Entry(width=38)
-entry_website.grid(row=1, column=1, columnspan=2)
+entry_website = Entry(width=21)
+entry_website.grid(row=1, column=1)
 entry_website.focus()
+
+btn_search = Button(text="Search", width=12, command=search_website)
+btn_search.grid(row=1, column=2)
 
 entry_username = Entry(width=38)
 entry_username.grid(row=2, column=1, columnspan=2)
