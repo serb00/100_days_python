@@ -35,7 +35,7 @@ def search_website():
     try:
         with open(PASSWORDS_JSON, mode="r") as file:
             data = json.load(file)
-            website = entry_website.get()
+            website = entry_website.get().capitalize()
             item = data[website]
             username = item["username"]
             password = item["password"]
