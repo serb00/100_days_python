@@ -63,6 +63,8 @@ def send_message(body):
 
 
 def format_message(difference, news):
+    """Returns a formatted message with the difference
+    in stock price and the first 3 news pieces"""
     if difference > 0:
         emoji = "🔺"
     else:
