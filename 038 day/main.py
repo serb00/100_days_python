@@ -1,7 +1,6 @@
 import requests
 import os
 import datetime as dt
-from requests import Response
 
 GENDER = "male"
 WEIGHT_KG = 60
@@ -49,7 +48,9 @@ def post_workout(workout):
     :type workout: dict
     :rtype: Response
     """
-    response = requests.post(url=SHEETY_ENDPOINT_POST, json=workout, headers=sheety_headers)
+    response = requests.post(url=SHEETY_ENDPOINT_POST,
+                             json=workout,
+                             headers=sheety_headers)
     response.raise_for_status()
     return response
 
@@ -85,7 +86,11 @@ def process_query(query, headers, parameters):
     :type query: str
     """
     parameters["query"] = query
-    response = requests.post(url=NUTRTIONIX_ENDPOINT, json=parameters, headers=headers)
+    response = requests.post(
+        url=NUTRTIONIX_ENDPOINT,
+        json=parameters,
+        headers=headers
+    )
     response.raise_for_status()
     results = []
     print("Your workout for today:")
@@ -94,13 +99,17 @@ def process_query(query, headers, parameters):
         exercise_duration = exercise["duration_min"]
         exercise_calories = exercise["nf_calories"]
         results.append((exercise_name, exercise_duration, exercise_calories))
-        print(f"{exercise_name}: {exercise_duration} minutes, {exercise_calories} calories burned")
+        print(f"{exercise_name}: {exercise_duration} minutes, "
+              f"{exercise_calories} calories burned")
     return results
 
 
 if __name__ == "__main__":
-    activities = process_query(input("What did you do today? "), query_headers, query_parameters)
+    activities = process_query(input("What did you do today? "),
+                               query_headers,
+                               query_parameters)
     print()
     for activity in activities:
         resp = post_workout(format_workout(*activity))
-        print(f"Workout {activity[0]} for {activity[2]} cal was posted to sheety")
+        print(f"Workout {activity[0]} for {activity[2]} cal "
+              f"was posted to sheety")
