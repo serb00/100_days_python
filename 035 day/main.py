@@ -20,6 +20,7 @@ def will_rain(weather_data):
 
 
 def send_whats_app_message(rainy) -> MessageInstance:
+    """Sends a message to the phone number by WhatsApp"""
     client = Client(account_sid, auth_token)
 
     if rainy:
