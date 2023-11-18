@@ -87,7 +87,6 @@ class FlightDeals:
     @staticmethod
     def get_users():
         """Get users
-        :param self:
         :rtype: Response
         """
         response = requests.get(
@@ -102,7 +101,6 @@ class FlightDeals:
         """Add user
         :param user:
         :type user: dict
-        :param self:
         """
         response = requests.post(
             url=ENDPOINT_USERS,

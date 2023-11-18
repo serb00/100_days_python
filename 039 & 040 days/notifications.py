@@ -1,5 +1,4 @@
 import os
-import requests
 from twilio.rest import Client
 
 TWILIO_ACCOUNT_SID = os.environ.get("TW_A_SID")
