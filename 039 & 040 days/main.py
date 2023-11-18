@@ -16,7 +16,6 @@ def find_best_price(list_flights, deal):
     for flight in list_flights:
         best_price = deal["price"]
         if flight["price"] <= best_price:
-            best_price = flight["price"]
             tmp_best_prices[deal["city"]] = flight
     return tmp_best_prices
 
@@ -63,26 +62,31 @@ def notify_user(best_flights_found, user_to_notify):
         print("No flights found, try another time.")
 
 
+def register_user():
+    global user
+    # Ask for user parameters input
+    user_first_name = input("What is your name? ")
+    user_last_name = input("What is your last name? ")
+    user_from_destination = input("From where you want to depart? ")
+    user_whatsapp = input("What is your whatsapp number? ")
+    user = {
+        "firstName": user_first_name,
+        "lastName": user_last_name,
+        "fromDestination": user_from_destination,
+        "whatsApp": user_whatsapp
+    }
+    fd.add_user(user)
+    print("User added. You will receive a message when we find the best flight deals.")
+
+
 if __name__ == "__main__":
     print("Welcome to Flight Club.")
-    print("We find the best flight deals and email you.")
+    print("We find the best flight deals and inform you.")
     fd = FlightDeals()
     answer = input("Do you want to Register or Check your flight deals? ")
 
     if answer.lower() == "register" or answer.lower() == "r":
-        # Ask for user parameters input
-        user_first_name = input("What is your name? ")
-        user_last_name = input("What is your last name? ")
-        user_from_destination = input("From where you want to depart? ")
-        user_whatsapp = input("What is your whatsapp number? ")
-        user = {
-            "firstName": user_first_name,
-            "lastName": user_last_name,
-            "fromDestination": user_from_destination,
-            "whatsApp": user_whatsapp
-        }
-        fd.add_user(user)
-        print("User added. You will receive a message when we find the best flight deals.")
+        register_user()
     elif answer.lower() == "check" or answer.lower() == "c":
         verify_iata_codes(fd)
         users = fd.get_users()
@@ -90,7 +94,3 @@ if __name__ == "__main__":
             print(f"Searching for best flights for {user['firstName']} {user['lastName']}.")
             best_flights = find_best_flights(fd.deals, user["fromDestination"])
             notify_user(best_flights, user)
-
-
-
-
