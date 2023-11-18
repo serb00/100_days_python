@@ -3,6 +3,8 @@ import requests
 from tqdm import tqdm
 
 SHEETY_ENDPOINT_FLIGHTDEALS_GET = os.environ.get("SHEETY_ENDPOINT_FLIGHTDEALS_GET")
+ENDPOINT_PRICES = SHEETY_ENDPOINT_FLIGHTDEALS_GET + "prices"
+ENDPOINT_USERS = SHEETY_ENDPOINT_FLIGHTDEALS_GET + "users"
 SHEETY_TOKEN = os.environ.get("SHEETY_TOKEN")
 SHEETY_HEADERS = {
     "Authorization": "Bearer " + SHEETY_TOKEN,
@@ -21,7 +23,7 @@ class FlightDeals:
         """
         tmp_deals = {}
         response = requests.get(
-            url=SHEETY_ENDPOINT_FLIGHTDEALS_GET,
+            url=ENDPOINT_PRICES,
             headers=SHEETY_HEADERS,
         )
         response.raise_for_status()
@@ -40,6 +42,13 @@ class FlightDeals:
         """
         return all([deal["is_code"] for deal in self.deals.values()])
 
+    def get_cities_without_iata_codes(self) -> list:
+        """Get cities without iata codes
+        :param self:
+        :rtype: list
+        """
+        return [deal["city"] for deal in self.deals.values() if not deal["is_code"]]
+
     def fill_iata_codes(self, city_data):
         """Update iata codes
         :param city_data:
@@ -49,26 +58,62 @@ class FlightDeals:
         for city in city_data.keys():
             self.deals[city]["iataCode"] = city_data[city]
             self.deals[city]["is_code"] = True
-        self.update_flight_deals()
+        self.update_flight_deals(city_data)
 
-    def update_flight_deals(self):
+    def update_flight_deals(self, cities_to_update):
         """Update flight deals
+        :param cities_to_update:
         :param self:
         """
-        with tqdm(total=len(self.deals), desc="Updating IATA codes for cities", unit="city",
+        with tqdm(total=len(cities_to_update), desc="Updating IATA codes for cities", unit="city",
                   ncols=100, colour="green") as pbar:
             for deal in self.deals.values():
-                response = requests.put(
-                    url=f"{SHEETY_ENDPOINT_FLIGHTDEALS_GET}/{deal['id']}",
-                    json={
-                        "price": {
-                            "city": deal["city"],
-                            "iataCode": deal["iataCode"],
-                            "lowestPrice": deal["price"],
-                        }
-                    },
-                    headers=SHEETY_HEADERS,
-                )
-                response.raise_for_status()
+                if deal["city"] in cities_to_update.keys():
+                    response = requests.put(
+                        url=f"{ENDPOINT_PRICES}/{deal['id']}",
+                        json={
+                            "price": {
+                                "city": deal["city"],
+                                "iataCode": deal["iataCode"],
+                                "lowestPrice": deal["price"],
+                            }
+                        },
+                        headers=SHEETY_HEADERS,
+                    )
+                    response.raise_for_status()
 
-                pbar.update(1)
+                    pbar.update(1)
+
+    @staticmethod
+    def get_users():
+        """Get users
+        :param self:
+        :rtype: Response
+        """
+        response = requests.get(
+            url=ENDPOINT_USERS,
+            headers=SHEETY_HEADERS,
+        )
+        response.raise_for_status()
+        return response.json()["users"]
+
+    @staticmethod
+    def add_user(user):
+        """Add user
+        :param user:
+        :type user: dict
+        :param self:
+        """
+        response = requests.post(
+            url=ENDPOINT_USERS,
+            json={
+                "user": {
+                    "firstName": user["firstName"],
+                    "lastName": user["lastName"],
+                    "fromDestination": user["fromDestination"],
+                    "whatsApp": user["whatsApp"],
+                }
+            },
+            headers=SHEETY_HEADERS,
+        )
+        response.raise_for_status()

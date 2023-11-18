@@ -10,8 +10,9 @@ class NotificationManager:
     def __init__(self):
         self.client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
-    def send_whatsapp_message(self, message):
+    def send_whatsapp_message(self, user, message):
         """Send whatsapp message
+        :param user:
         :param message:
         :type message: str
         :rtype: Response
@@ -19,7 +20,7 @@ class NotificationManager:
         message = self.client.messages.create(
             body=message,
             from_="whatsapp:+14155238886",
-            to="whatsapp:+79957873534"
+            to="whatsapp:" + user["whatsApp"]
         )
         return message.status
 

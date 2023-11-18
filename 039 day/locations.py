@@ -20,22 +20,26 @@ class Locations:
         with tqdm(total=len(self.cities), desc="Getting IATA codes for cities", unit="city",
                   ncols=100, colour="green") as pbar:
             for city in self.cities.keys():
-                parameters = {
-                    "term": city,
-                    "locale": "en-US",
-                    "location_types": "airport",
-                    "limit": 1,
-                    "active_only": "true",
-                    "sort": "name",
-                }
-                response = requests.get(
-                    url=TEQUILA_LOCATIONS_ENDPOINT,
-                    headers=TEQUILA_HEADERS,
-                    params=parameters,
-                )
-                response.raise_for_status()
-                data = response.json()
-                self.cities[city] = data["locations"][0]["code"]
+                self.cities[city] = self.get_iata_code(city)
 
                 pbar.update(1)
+
+    @staticmethod
+    def get_iata_code(city):
+        parameters = {
+            "term": city,
+            "locale": "en-US",
+            "location_types": "airport",
+            "limit": 1,
+            "active_only": "true",
+            "sort": "name",
+        }
+        response = requests.get(
+            url=TEQUILA_LOCATIONS_ENDPOINT,
+            headers=TEQUILA_HEADERS,
+            params=parameters,
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data["locations"][0]["code"]
 
