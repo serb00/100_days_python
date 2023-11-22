@@ -1,0 +1,27 @@
+/*************** TAG SELECTORS ***************/
+h1 {
+    color: red;
+}
+img {
+    background-color: red;
+}
+img:hover {
+    background-color: green;
+}
+/*************** CLASS SELECTORS ***************/
+.p1 {
+    color: blueviolet;
+}
+.p2 {
+    color: blue;
+}
+.p3 {
+    color: burlywood;
+}
+/*************** ID SELECTORS ***************/
+#heading {
+    color: green;
+}
+#heading:hover {
+    color: greenyellow;
+}
