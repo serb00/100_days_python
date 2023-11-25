@@ -13,3 +13,6 @@ h1 {
 h3 {
     color: #2F4F4F;
 }
+.profile_picture {
+    border-radius: 100px;
+}
