@@ -75,13 +75,18 @@ def get_playlist_link(p_id):
 
 
 if __name__ == '__main__':
+    # get date from user
     date = ask_for_date()
+    # connect to spotify
     spotify_connection = connect_to_spotify()
+    # scrape the music titles for the date
     list_of_music_titles = scrape_music_titles_for_date(date)
     print(f"We found {len(list_of_music_titles)} best songs on {calendar.month_name[date.month]} {date.year}")
+    # create a playlist on spotify
     playlist_id = create_playlist(spotify_connection, f"Top 100 Songs of {calendar.month_name[date.month]} {date.year}")
     added, skipped = 0, 0
     song_uris = []
+    # search for the songs on spotify
     with tqdm(total=len(list_of_music_titles), desc="Searching songs", unit="song",
               ncols=100, colour="green") as pbar:
         for song in list_of_music_titles:
@@ -97,6 +102,7 @@ if __name__ == '__main__':
             added += 1
             pbar.update(1)
 
+    # add the songs to the playlist
     add_songs_to_playlist(spotify_connection, playlist_id, song_uris)
 
     print(f"Added {added} songs to the playlist. Skipped {skipped} songs.")
