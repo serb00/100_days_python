@@ -6,6 +6,7 @@ import os
 api_key = os.environ.get("OWM_API_KEY")
 account_sid = os.environ.get("TW_A_SID")
 auth_token = os.environ.get("TW_TOKEN")
+MY_WHATSAPP = os.environ.get("MY_WHATSAPP")
 weather_url = "http://api.openweathermap.org/data/2.5/forecast"
 location_url = "http://api.openweathermap.org/geo/1.0/direct"
 
@@ -31,7 +32,7 @@ def send_whats_app_message(rainy) -> MessageInstance:
     message = client.messages.create(
         from_="whatsapp:+14155238886",
         body=body,
-        to="whatsapp:+79957873534"
+        to=f"whatsapp:{MY_WHATSAPP}"
     )
 
     return message

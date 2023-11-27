@@ -8,6 +8,7 @@ NEWS_API_KEY = os.environ.get("NEWS_API_KEY")
 STOCKS_API_KEY = os.environ.get("STOCKS_API_KEY")
 TWILIO_SID = os.environ.get("TW_A_SID")
 TWILIO_TOKEN = os.environ.get("TW_TOKEN")
+MY_WHATSAPP = os.environ.get("MY_WHATSAPP")
 
 STOCK = "TSLA"
 STOCK_URL = "https://www.alphavantage.co/query"
@@ -57,7 +58,7 @@ def send_message(body):
     message = client.messages.create(
         body=body,
         from_="whatsapp:+14155238886",
-        to="whatsapp:+79957873534"
+        to=f"whatsapp:{MY_WHATSAPP}"
     )
     print(f"message status: {message.status}.")
 
