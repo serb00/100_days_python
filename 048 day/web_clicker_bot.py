@@ -1,11 +1,10 @@
-import datetime
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 import datetime as dt
 
 
-PURCHASE_INTERVAL = 3 # seconds
+PURCHASE_INTERVAL = 3  # seconds
 driver = webdriver.Safari()
 
 clicker_url = "https://orteil.dashnet.org/experiments/cookie/"
@@ -14,7 +13,13 @@ driver.get(clicker_url)
 cookie = driver.find_element(By.ID, value="cookie")
 
 
-def get_store_items():
+def get_store_items() -> list[tuple[WebElement, int, bool]]:
+    """
+    Retrieves all the available store items from the game's webpage.
+
+    Returns:
+        A list of tuples, each containing an item, its price, and whether it's available for purchase.
+    """
     store_items = driver.find_elements(By.CSS_SELECTOR, value="#store div")
     result = []
     try:
@@ -30,7 +35,13 @@ def get_store_items():
     return result
 
 
-def buy_best_store_upgrade(available_money):
+def buy_best_store_upgrade(available_money: int) -> None:
+    """
+    Attempts to buy the best upgrade that the bot can afford.
+
+    Args:
+        available_money: The amount of money currently available.
+    """
     items = get_store_items()
     for upgrade, price, available in items:
         if available and price <= available_money:
@@ -40,12 +51,12 @@ def buy_best_store_upgrade(available_money):
             continue
 
 
-timer = dt.datetime.now() + datetime.timedelta(seconds=PURCHASE_INTERVAL)
-session_end = dt.datetime.now() + datetime.timedelta(minutes=5)
+timer = dt.datetime.now() + dt.timedelta(seconds=PURCHASE_INTERVAL)
+session_end = dt.datetime.now() + dt.timedelta(minutes=5)
 while session_end > dt.datetime.now():
     cookie.click()
     if timer <= dt.datetime.now():
-        timer += datetime.timedelta(seconds=PURCHASE_INTERVAL)
+        timer += dt.timedelta(seconds=PURCHASE_INTERVAL)
         money = driver.find_element(By.ID, value="money")
         current_money = int(money.text.replace(",", ""))
         buy_best_store_upgrade(current_money)
