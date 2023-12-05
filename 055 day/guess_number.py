@@ -1,71 +1,79 @@
+from secrets import randbelow
+from flask import Flask, session
 from enum import Enum
-from flask import Flask
-from random import randint
 
-MIN_VALUE = 0
+MIN_VALUE = 1
 MAX_VALUE = 10
 GUESSES_PER_GAME = 5
 
 
 class GuessResult(Enum):
-    OUT_OF_BOUNDS = 1,
-    LOWER = 2,
-    HIGHER = 3,
-    MATCH = 4,
-    NO_GUESSES_LEFT = 5
+    LOWER = "Your number is lower.<br/>You have {self.guesses_left} " \
+        "attempts left."
+    HIGHER = "Your number is higher.<br/>You have {self.guesses_left} " \
+        "attempts left."
+    CORRECT = "You guessed the number!<br/>Still having {self.guesses_left} " \
+        "attempts left."
+    OUT_OF_BOUNDS = "Your number is out of bounds.<br/>Number should be " \
+        " between {MIN_VALUE} and {MAX_VALUE}."
+    OUT_OF_GUESSES = "You ran out of guesses.<br/>Game over."
+    UNKNOWN = "Unknown behavior"
 
 
 class Game:
     def __init__(self) -> None:
-        self.number = randint(MIN_VALUE, MAX_VALUE)
+        self.number = randbelow(MAX_VALUE - MIN_VALUE + 1) + MIN_VALUE
         self.guesses_left = GUESSES_PER_GAME
 
-    # TODO: Make this function return codes using GuessResult
-    # instead of strings
-    # TODO: move reinitialization of game out from this function
+    def reset_game(self):
+        self.number = randbelow(MAX_VALUE - MIN_VALUE + 1) + MIN_VALUE
+        self.guesses_left = GUESSES_PER_GAME
 
     def guess_number(self, number):
         self.guesses_left -= 1
-        if MIN_VALUE < number < self.number:
-            return "Your number is lower.<br/>" \
-                f"You have {self.guesses_left} attempts left."
-        elif MAX_VALUE > number > self.number:
-            return "Your number is higher.<br/>" \
-                f"You have {self.guesses_left} attempts left."
-        elif number == self.number:
-            self.__init__()
-            return "You guessed the number!<br/>" \
-                f"Still having {self.guesses_left} attempts left."
+        if self.guesses_left < 0:
+            return GuessResult.OUT_OF_GUESSES.value
         elif number < MIN_VALUE or number > MAX_VALUE:
-            return "Your number is out of bounds.<br/>" \
-                f"Number should be between {MIN_VALUE} and {MAX_VALUE}."
-        elif self.guesses_left < 0:
-            self.__init__()
-            return "You ran out of guesses.<br/>Game over."
+            return GuessResult.OUT_OF_BOUNDS.value
+        elif MIN_VALUE < number < self.number:
+            return GuessResult.LOWER.value
+        elif MAX_VALUE > number > self.number:
+            return GuessResult.HIGHER.value
+        elif number == self.number:
+            return GuessResult.CORRECT.value
         else:
-            return "Unknown behavior"
+            return GuessResult.UNKNOWN.value
 
-    def get_answer(self):
-        return self.number.__str__()
+    @property
+    def answer(self):
+        return str(self.number)
 
 
 app = Flask(__name__)
-game = Game()
 
 
 @app.route('/')
 def index():
+    session['game'] = Game()
     return "Guess the number!"
 
 
 @app.route('/<int:number>')
 def guess(number):
+    game = session.get('game')
+    if game is None:
+        game = Game()
+        session['game'] = game
     return game.guess_number(number)
 
 
 @app.route('/answer')
 def func_name():
-    return game.get_answer()
+    game = session.get('game')
+    if game is None:
+        game = Game()
+        session['game'] = game
+    return game.answer
 
 
 if __name__ == '__main__':
